@@ -137,20 +137,48 @@ export class GenericTableComponent<T = unknown> {
     });
   }
 
+  /** Column definition for a displayed key, if it exists. */
+  getColumnByKey(key: string): ColumnDef<T> | undefined {
+    return this.columns().find((column) => column.key === key);
+  }
+
+  /** Width hints for `<col>` elements (used with `table-layout: fixed`). */
+  columnColStyles(column: ColumnDef<T>): Record<string, string> {
+    const styles: Record<string, string> = {};
+
+    if (column.width) {
+      styles['width'] = column.width;
+      return styles;
+    }
+
+    if (column.minWidth && this.isPositiveLength(column.minWidth)) {
+      styles['width'] = column.minWidth;
+    }
+
+    return styles;
+  }
+
   /** Inline width constraints applied to header and body cells. */
   columnWidthStyles(column: ColumnDef<T>): Record<string, string> {
     const styles: Record<string, string> = {};
 
     if (column.width) {
       styles['width'] = column.width;
+      styles['max-width'] = column.width;
     }
 
-    const minWidth = column.minWidth ?? column.width;
-    if (minWidth) {
-      styles['min-width'] = minWidth;
+    if (column.minWidth !== undefined) {
+      styles['min-width'] = column.minWidth;
+    } else if (column.width) {
+      styles['min-width'] = column.width;
     }
 
     return styles;
+  }
+
+  private isPositiveLength(value: string): boolean {
+    const parsed = Number.parseFloat(value);
+    return !Number.isNaN(parsed) && parsed > 0;
   }
 
   /** Resolve the plain-text value for a cell without a custom template. */

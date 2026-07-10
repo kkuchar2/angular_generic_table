@@ -22,6 +22,14 @@
       [trackBy]="trackBy()"
       (matSortChange)="sortChange.emit($event)"
     >
+      <colgroup>
+        @for (key of displayedColumns(); track key) {
+          @if (getColumnByKey(key); as col) {
+            <col [ngStyle]="columnColStyles(col)" />
+          }
+        }
+      </colgroup>
+
       @for (col of columns(); track col.key) {
         <ng-container [matColumnDef]="col.key">
           @if (col.sortable) {
@@ -52,10 +60,12 @@
             [style.text-align]="col.align ?? 'left'"
           >
             @if (getCellTemplate(col.key); as template) {
-              <ng-container
-                [ngTemplateOutlet]="template"
-                [ngTemplateOutletContext]="cellContext(row)"
-              />
+              <div class="generic-table__cell-content">
+                <ng-container
+                  [ngTemplateOutlet]="template"
+                  [ngTemplateOutletContext]="cellContext(row)"
+                />
+              </div>
             } @else {
               {{ formatCell(col, row) }}
             }

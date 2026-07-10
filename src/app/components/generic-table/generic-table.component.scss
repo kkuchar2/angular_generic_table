@@ -38,11 +38,10 @@
 
 table {
   // Grow past the container when column min-widths require it; the scroll
-  // wrapper handles overflow. `table-layout: fixed` ignores min-width and
-  // squeezes flexible columns when another column has an explicit width.
+  // wrapper handles overflow.
   width: max-content;
   min-width: 100%;
-  table-layout: auto;
+  table-layout: fixed;
 }
 
 .mat-mdc-header-cell,
@@ -51,6 +50,8 @@ table {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: middle;
+  // Let fixed-width / flex cell content shrink below its intrinsic size.
+  min-width: 0;
 }
 
 .mat-mdc-cell {
@@ -83,6 +84,13 @@ table {
 
 .mat-sort-header:not(.mat-sort-header-disabled) .mat-sort-header-arrow {
   flex-shrink: 0;
+}
+
+// Constrains projected custom templates to the column width so overflow/ellipsis work.
+.generic-table__cell-content {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .generic-table__empty {
