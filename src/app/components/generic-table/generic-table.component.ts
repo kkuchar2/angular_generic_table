@@ -1,0 +1,183 @@
+import { NgTemplateOutlet } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChildren,
+  effect,
+  input,
+  linkedSignal,
+  output,
+  TemplateRef,
+  TrackByFunction,
+  viewChild,
+} from '@angular/core';
+import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+
+import { GenericTableCellDirective } from './generic-table-cell.directive';
+import { ColumnDef, GenericTableCellContext } from './generic-table.types';
+
+/**
+ * A configurable, signal-based table built on Angular Material's `mat-table`.
+ *
+ * Features: per-column sorting, optional pagination (or a scrollable body),
+ * a chip-based column visibility toggle, custom cell templates, optional row
+ * click, and a centered empty state.
+ *
+ * @typeParam T - The row model. Inferred from the `data`/`columns` inputs.
+ */
+@Component({
+  selector: 'app-generic-table',
+  imports: [NgTemplateOutlet, MatTableModule, MatSortModule, MatPaginatorModule, MatChipsModule],
+  templateUrl: './generic-table.component.html',
+  styleUrl: './generic-table.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class GenericTableComponent<T = unknown> {
+  /** Column definitions in display order. */
+  readonly columns = input.required<ColumnDef<T>[]>();
+  /** Row data. Sorting and pagination are applied client-side. */
+  readonly data = input.required<readonly T[]>();
+  /** Show a paginator. When `false` the table body scrolls instead. */
+  readonly paginated = input(false);
+  /** Initial page size (used when `paginated` is true). */
+  readonly pageSize = input(10);
+  /** Page size options offered by the paginator. */
+  readonly pageSizeOptions = input<number[]>([5, 10, 25, 50]);
+  /** Show the chip list that toggles hideable columns. */
+  readonly showColumnToggle = input(true);
+  /** Message shown when there are no rows. */
+  readonly emptyMessage = input('No data available');
+  /** Emit `rowClick` and apply hover styling when true. */
+  readonly rowClickable = input(false);
+  /** Caps the scroll container height, e.g. `'320px'`. */
+  readonly maxHeight = input<string | null>(null);
+  /**
+   * `trackBy` for rows (improves rendering and preserves DOM state).
+   * Defaults to identity tracking, matching `mat-table`'s built-in behavior.
+   */
+  readonly trackBy = input<TrackByFunction<T>>((_index, row) => row);
+
+  /** Emitted when a row is clicked (only when `rowClickable` is true). */
+  readonly rowClick = output<T>();
+  /** Emitted when the sort state changes. */
+  readonly sortChange = output<Sort>();
+  /** Emitted when the page changes. */
+  readonly pageChange = output<PageEvent>();
+
+  readonly dataSource = new MatTableDataSource<T>();
+
+  private readonly sort = viewChild(MatSort);
+  private readonly paginator = viewChild(MatPaginator);
+  private readonly cellDirectives = contentChildren(GenericTableCellDirective);
+
+  private readonly cellTemplates = computed(() => {
+    const templates = new Map<string, TemplateRef<GenericTableCellContext<T>>>();
+
+    for (const directive of this.cellDirectives()) {
+      templates.set(directive.columnKey(), directive.templateRef);
+    }
+
+    return templates;
+  });
+
+  /** Columns that appear in the visibility toggle. */
+  readonly hideableColumns = computed(() =>
+    this.columns().filter((column) => column.hideable !== false),
+  );
+
+  /** Set of currently visible column keys; reset whenever `columns` changes. */
+  readonly visibleKeys = linkedSignal(() => {
+    const keys = this.columns()
+      .filter((column) => column.visible !== false)
+      .map((column) => column.key);
+
+    return new Set(keys);
+  });
+
+  /** Keys of the columns rendered right now, in order. */
+  readonly displayedColumns = computed(() =>
+    this.columns()
+      .filter((column) => column.hideable === false || this.visibleKeys().has(column.key))
+      .map((column) => column.key),
+  );
+
+  constructor() {
+    this.dataSource.sortingDataAccessor = (row, columnKey) => {
+      const column = this.columns().find((item) => item.key === columnKey);
+
+      if (!column) {
+        return '';
+      }
+
+      if (column.sortAccessor) {
+        return column.sortAccessor(row);
+      }
+
+      if (column.cell) {
+        return column.cell(row);
+      }
+
+      return this.getRowValue(row, columnKey);
+    };
+
+    effect(() => {
+      this.dataSource.data = [...this.data()];
+    });
+
+    effect(() => {
+      this.dataSource.sort = this.sort() ?? null;
+    });
+
+    effect(() => {
+      this.dataSource.paginator = this.paginated() ? (this.paginator() ?? null) : null;
+    });
+  }
+
+  /** Resolve the plain-text value for a cell without a custom template. */
+  formatCell(column: ColumnDef<T>, row: T): string | number {
+    if (column.cell) {
+      return column.cell(row);
+    }
+
+    return this.getRowValue(row, column.key);
+  }
+
+  /** The custom template for a column, or `null` to fall back to text. */
+  getCellTemplate(key: string): TemplateRef<GenericTableCellContext<T>> | null {
+    return this.cellTemplates().get(key) ?? null;
+  }
+
+  /** Build the context object handed to a custom cell template. */
+  cellContext(row: T): GenericTableCellContext<T> {
+    return { $implicit: row, row };
+  }
+
+  isColumnVisible(key: string): boolean {
+    return this.visibleKeys().has(key);
+  }
+
+  onToggleColumns(event: MatChipListboxChange): void {
+    if (Array.isArray(event.value)) {
+      this.visibleKeys.set(new Set(event.value));
+    }
+  }
+
+  onRowClick(row: T): void {
+    if (this.rowClickable()) {
+      this.rowClick.emit(row);
+    }
+  }
+
+  private getRowValue(row: T, key: string): string | number {
+    if (typeof row !== 'object' || row === null || !(key in row)) {
+      return '';
+    }
+
+    const value = (row as Record<string, unknown>)[key];
+    return typeof value === 'string' || typeof value === 'number' ? value : '';
+  }
+}

@@ -1,0 +1,89 @@
+<section class="home">
+  <header class="home__header">
+    <h1 class="home__title">Generic Table</h1>
+    <p class="home__subtitle">Generic table component &mdash; variants showcase.</p>
+  </header>
+
+  <article class="home__demo">
+    <h2 class="home__demo-title">1. Full featured</h2>
+    <p class="home__demo-hint">
+      Sorting, pagination, column toggle chips, a custom status badge cell, and clickable rows.
+    </p>
+
+    <app-generic-table
+      [columns]="columns"
+      [data]="rows()"
+      [paginated]="true"
+      [pageSize]="5"
+      [rowClickable]="true"
+      [trackBy]="trackById"
+      (rowClick)="onRowClick($event)"
+    >
+      <ng-template appGenericTableCell="status" let-row>
+        <span [class]="statusBadgeClass($any(row).status)">{{ $any(row).status }}</span>
+      </ng-template>
+    </app-generic-table>
+
+    @if (selectedRow(); as selected) {
+      <p class="home__selection">
+        Selected: <strong>{{ selected.name }}</strong> ({{ selected.email }})
+      </p>
+    }
+  </article>
+
+  <article class="home__demo">
+    <h2 class="home__demo-title">2. Scrollable (no pagination)</h2>
+    <p class="home__demo-hint">
+      All rows in a fixed-height, scrollable body with a sticky header. Column toggle disabled.
+    </p>
+
+    <app-generic-table
+      [columns]="columns"
+      [data]="rows()"
+      [showColumnToggle]="false"
+      [trackBy]="trackById"
+      maxHeight="260px"
+    />
+  </article>
+
+  <article class="home__demo">
+    <h2 class="home__demo-title">3. Custom cell templates</h2>
+    <p class="home__demo-hint">
+      Multiple projected templates: an initials avatar, a mailto link, and a status badge.
+    </p>
+
+    <app-generic-table
+      [columns]="showcaseColumns"
+      [data]="showcaseRows()"
+      [showColumnToggle]="false"
+      [trackBy]="trackById"
+    >
+      <ng-template appGenericTableCell="name" let-row>
+        <span class="home__user">
+          <span class="home__avatar">{{ initials($any(row)) }}</span>
+          {{ $any(row).name }}
+        </span>
+      </ng-template>
+
+      <ng-template appGenericTableCell="email" let-row>
+        <a class="home__link" [href]="'mailto:' + $any(row).email">{{ $any(row).email }}</a>
+      </ng-template>
+
+      <ng-template appGenericTableCell="status" let-row>
+        <span [class]="statusBadgeClass($any(row).status)">{{ $any(row).status }}</span>
+      </ng-template>
+    </app-generic-table>
+  </article>
+
+  <article class="home__demo">
+    <h2 class="home__demo-title">4. Empty state</h2>
+    <p class="home__demo-hint">A centered message replaces the rows when there is no data.</p>
+
+    <app-generic-table
+      [columns]="columns"
+      [data]="emptyRows()"
+      [showColumnToggle]="false"
+      emptyMessage="No team members found."
+    />
+  </article>
+</section>

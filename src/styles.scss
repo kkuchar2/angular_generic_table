@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+@use 'styles/variables';
+@use 'styles/base';
+
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
