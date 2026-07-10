@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,7 +31,7 @@ import { ColumnDef, GenericTableCellContext } from './generic-table.types';
  */
 @Component({
   selector: 'app-generic-table',
-  imports: [NgTemplateOutlet, MatTableModule, MatSortModule, MatPaginatorModule, MatChipsModule],
+  imports: [NgStyle, NgTemplateOutlet, MatTableModule, MatSortModule, MatPaginatorModule, MatChipsModule],
   templateUrl: './generic-table.component.html',
   styleUrl: './generic-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -135,6 +135,22 @@ export class GenericTableComponent<T = unknown> {
     effect(() => {
       this.dataSource.paginator = this.paginated() ? (this.paginator() ?? null) : null;
     });
+  }
+
+  /** Inline width constraints applied to header and body cells. */
+  columnWidthStyles(column: ColumnDef<T>): Record<string, string> {
+    const styles: Record<string, string> = {};
+
+    if (column.width) {
+      styles['width'] = column.width;
+    }
+
+    const minWidth = column.minWidth ?? column.width;
+    if (minWidth) {
+      styles['min-width'] = minWidth;
+    }
+
+    return styles;
   }
 
   /** Resolve the plain-text value for a cell without a custom template. */

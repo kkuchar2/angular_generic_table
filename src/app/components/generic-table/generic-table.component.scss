@@ -37,8 +37,12 @@
 }
 
 table {
-  width: 100%;
-  table-layout: fixed;
+  // Grow past the container when column min-widths require it; the scroll
+  // wrapper handles overflow. `table-layout: fixed` ignores min-width and
+  // squeezes flexible columns when another column has an explicit width.
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
 }
 
 .mat-mdc-header-cell,
