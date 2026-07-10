@@ -30,6 +30,7 @@
               *matHeaderCellDef
               mat-sort-header
               [style.width]="col.width"
+              [style.min-width]="col.minWidth"
               [style.text-align]="col.align ?? 'left'"
             >
               {{ col.header }}
@@ -40,6 +41,7 @@
               *matHeaderCellDef
               class="generic-table__header--plain"
               [style.width]="col.width"
+              [style.min-width]="col.minWidth"
               [style.text-align]="col.align ?? 'left'"
             >
               {{ col.header }}

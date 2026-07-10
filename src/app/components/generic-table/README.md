@@ -123,6 +123,7 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `hideable`     | `boolean`                       | If `false`, always visible and not shown in the toggle (default `true`). |
 | `visible`      | `boolean`                       | Initial visibility (default `true`).                             |
 | `width`        | `string`                        | Fixed width, e.g. `'120px'` or `'20%'`.                          |
+| `minWidth`     | `string`                        | Minimum width, e.g. `'120px'`; the column never shrinks below it. |
 | `align`        | `'left' \| 'center' \| 'right'` | Text alignment (default `'left'`).                               |
 
 ## Custom cell templates

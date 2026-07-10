@@ -20,6 +20,8 @@ export interface ColumnDef<T = unknown> {
   visible?: boolean;
   /** Fixed column width, e.g. `'120px'` or `'20%'`. */
   width?: string;
+  /** Minimum column width, e.g. `'120px'`. The column never shrinks below this. */
+  minWidth?: string;
   /** Horizontal alignment of header and cells. Defaults to `'left'`. */
   align?: 'left' | 'center' | 'right';
 }
