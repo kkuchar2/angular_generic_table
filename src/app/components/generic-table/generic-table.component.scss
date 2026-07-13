@@ -1,6 +1,16 @@
 // Self-contained styling. Every look-and-feel value is exposed as a `--gt-*`
 // custom property (with a sensible fallback), so the component works when
 // pasted into any project and can be themed from the outside if desired.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:host(.generic-table-host--fluid) {
+  height: 100%;
+}
+
 .generic-table {
   --gt-gap: var(--spacing-md, 1rem);
   --gt-toggle-gap: var(--spacing-sm, 0.5rem);
@@ -30,10 +40,20 @@
   gap: var(--gt-toggle-gap);
 }
 
+.generic-table--fluid {
+  flex: 1;
+  min-height: 0;
+}
+
 .generic-table__scroll {
   overflow: auto;
   border: 1px solid var(--gt-border);
   border-radius: var(--gt-radius);
+}
+
+.generic-table__scroll--fluid {
+  flex: 1;
+  min-height: 0;
 }
 
 table {

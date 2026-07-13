@@ -35,6 +35,10 @@ import { ColumnDef, GenericTableCellContext } from './generic-table.types';
   templateUrl: './generic-table.component.html',
   styleUrl: './generic-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'generic-table-host',
+    '[class.generic-table-host--fluid]': 'isFluidMaxHeight()',
+  },
 })
 export class GenericTableComponent<T = unknown> {
   /** Column definitions in display order. */
@@ -53,8 +57,14 @@ export class GenericTableComponent<T = unknown> {
   readonly emptyMessage = input('No data available');
   /** Emit `rowClick` and apply hover styling when true. */
   readonly rowClickable = input(false);
-  /** Caps the scroll container height, e.g. `'320px'`. */
+  /** Caps the scroll container height, e.g. `'320px'` or `'100%'` to fill a sized parent. */
   readonly maxHeight = input<string | null>(null);
+
+  /** Percentage `maxHeight` values use flex fill layout instead of content-sized height. */
+  readonly isFluidMaxHeight = computed(() => {
+    const height = this.maxHeight();
+    return height != null && /%$/.test(height.trim());
+  });
   /**
    * `trackBy` for rows (improves rendering and preserves DOM state).
    * Defaults to identity tracking, matching `mat-table`'s built-in behavior.

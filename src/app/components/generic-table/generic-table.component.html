@@ -1,4 +1,4 @@
-<div class="generic-table">
+<div class="generic-table" [class.generic-table--fluid]="isFluidMaxHeight()">
   @if (showColumnToggle() && hideableColumns().length > 0) {
     <mat-chip-listbox
       class="generic-table__column-toggle"
@@ -14,7 +14,11 @@
     </mat-chip-listbox>
   }
 
-  <div class="generic-table__scroll" [style.max-height]="maxHeight()">
+  <div
+    class="generic-table__scroll"
+    [class.generic-table__scroll--fluid]="isFluidMaxHeight()"
+    [style.max-height]="maxHeight()"
+  >
     <table
       mat-table
       matSort

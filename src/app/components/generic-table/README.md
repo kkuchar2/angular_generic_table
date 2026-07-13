@@ -100,7 +100,7 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `showColumnToggle`| `boolean`                | `true`                | Show the column visibility chips.                        |
 | `emptyMessage`    | `string`                 | `'No data available'` | Message shown when there are no rows.                    |
 | `rowClickable`    | `boolean`                | `false`               | Enable row click + hover styling.                        |
-| `maxHeight`       | `string \| null`         | `null`                | Cap the scroll container height, e.g. `'320px'`.         |
+| `maxHeight`       | `string \| null`         | `null`                | Cap the scroll container height, e.g. `'320px'`. Percentages (e.g. `'100%'`) fill a sized parent via flex layout — the parent needs a defined height (`flex: 1; min-height: 0` in a column flex container works). |
 | `trackBy`         | `TrackByFunction<T>`     | identity tracking     | Row `trackBy`; defaults to tracking by row identity.     |
 
 ## Outputs
@@ -142,7 +142,7 @@ import { GenericTableCellDirective, GenericTableComponent } from './components/g
 
 ```html
 <app-generic-table [columns]="columns" [data]="rows()">
-  <ng-template appGenericTableCell="status" let-row>
+  <ng-template appGenericTableCell="status" [appGenericTableCellFor]="rows()" let-row>
     <span class="badge badge--{{ row.status }}">{{ row.status }}</span>
   </ng-template>
 </app-generic-table>
@@ -152,8 +152,14 @@ The template context exposes the row as both `$implicit` (`let-row`) and `row`
 (`let-row="row"`). A column can still define a `cell` formatter for sorting/plain
 rendering; when a matching template exists it takes precedence for display.
 
-> Under `strictTemplates`, `let-row` is typed as `unknown`. Cast it where needed
-> (e.g. `$any(row).status`) or bind through a typed helper on your component.
+### Typing `let-row`
+
+Bind `[appGenericTableCellFor]` to the same value you pass to `[data]`. The
+directive infers its row type from that binding (the same way `*ngFor` infers its
+item type from `ngForOf`), so `let-row` is fully typed under `strictTemplates` —
+no `$any` casts. The binding is inference-only and is never read at runtime.
+
+> If you omit `[appGenericTableCellFor]`, `let-row` falls back to `unknown`.
 
 ## Styling
 

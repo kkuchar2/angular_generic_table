@@ -19,8 +19,8 @@
       [trackBy]="trackById"
       (rowClick)="onRowClick($event)"
     >
-      <ng-template appGenericTableCell="status" let-row>
-        <span [class]="statusBadgeClass($any(row).status)">{{ $any(row).status }}</span>
+      <ng-template appGenericTableCell="status" [appGenericTableCellFor]="rows()" let-row>
+        <span [class]="statusBadgeClass(row.status)">{{ row.status }}</span>
       </ng-template>
     </app-generic-table>
 
@@ -58,19 +58,19 @@
       [showColumnToggle]="false"
       [trackBy]="trackById"
     >
-      <ng-template appGenericTableCell="name" let-row>
+      <ng-template appGenericTableCell="name" [appGenericTableCellFor]="showcaseRows()" let-row>
         <span class="home__user">
-          <span class="home__avatar">{{ initials($any(row)) }}</span>
-          {{ $any(row).name }}
+          <span class="home__avatar">{{ initials(row) }}</span>
+          {{ row.name }}
         </span>
       </ng-template>
 
-      <ng-template appGenericTableCell="email" let-row>
-        <a class="home__link" [href]="'mailto:' + $any(row).email">{{ $any(row).email }}</a>
+      <ng-template appGenericTableCell="email" [appGenericTableCellFor]="showcaseRows()" let-row>
+        <a class="home__link" [href]="'mailto:' + row.email">{{ row.email }}</a>
       </ng-template>
 
-      <ng-template appGenericTableCell="status" let-row>
-        <span [class]="statusBadgeClass($any(row).status)">{{ $any(row).status }}</span>
+      <ng-template appGenericTableCell="status" [appGenericTableCellFor]="showcaseRows()" let-row>
+        <span [class]="statusBadgeClass(row.status)">{{ row.status }}</span>
       </ng-template>
     </app-generic-table>
   </article>
