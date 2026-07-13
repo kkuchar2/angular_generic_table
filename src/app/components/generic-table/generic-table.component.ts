@@ -18,10 +18,7 @@ import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 import { GenericTableCellDirective } from './generic-table-cell.directive';
-import { ColumnDef, GenericTableCellContext } from './generic-table.types';
-
-/** Units that size against a parent/container rather than an absolute length. */
-const RELATIVE_MAX_HEIGHT = /(?:%|cqh|cqb|cqmin|cqmax|dvh|dvb|svh|svb|lvh|lvb|vh|vb)$/i;
+import { ColumnDef, GenericTableCellContext, GenericTableHeightMode } from './generic-table.types';
 
 /**
  * A configurable, signal-based table built on Angular Material's `mat-table`.
@@ -40,7 +37,8 @@ const RELATIVE_MAX_HEIGHT = /(?:%|cqh|cqb|cqmin|cqmax|dvh|dvb|svh|svb|lvh|lvb|vh
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'generic-table-host',
-    '[class.generic-table-host--fluid]': 'isFluidMaxHeight()',
+    '[class.generic-table-host--fill]': 'isFillMode()',
+    '[class.generic-table-host--parent]': 'isParentMode()',
   },
 })
 export class GenericTableComponent<T = unknown> {
@@ -60,17 +58,35 @@ export class GenericTableComponent<T = unknown> {
   readonly emptyMessage = input('No data available');
   /** Emit `rowClick` and apply hover styling when true. */
   readonly rowClickable = input(false);
-  /** Caps the scroll container height, e.g. `'320px'`, `'100%'`, or `'100cqh'`. */
+  /**
+   * How the table sizes vertically:
+   * - `'auto'` (default): grows with content; pair with `maxHeight` to cap it.
+   * - `'fill'`: fills the remaining space of a flex-column parent (`flex: 1`).
+   * - `'parent'`: fills the parent's full height (`height: 100%`).
+   *
+   * In `'fill'`/`'parent'` the body scrolls once rows exceed the available height,
+   * and both require the parent to resolve a height (see the component README).
+   */
+  readonly heightMode = input<GenericTableHeightMode>('auto');
+  /**
+   * Exact, fixed height for the scroll body, e.g. `'320px'`. When set it wins over
+   * `heightMode`: the body is always this tall and scrolls when rows overflow.
+   */
+  readonly height = input<string | null>(null);
+  /**
+   * Caps the scroll body height, e.g. `'320px'`. Composes with any `heightMode`
+   * (e.g. `'fill'` + `maxHeight` fills remaining space but never grows past the cap).
+   */
   readonly maxHeight = input<string | null>(null);
 
-  /**
-   * Relative `maxHeight` values (`%`, `cqh`, `vh`, …) use a flex fill chain so the
-   * cap resolves against a sized parent instead of content height.
-   */
-  readonly isFluidMaxHeight = computed(() => {
-    const height = this.maxHeight()?.trim();
-    return height != null && RELATIVE_MAX_HEIGHT.test(height);
-  });
+  /** A fixed `height` was provided, so the body is sized explicitly. */
+  readonly isFixed = computed(() => this.height() != null);
+  /** The body uses a flex fill chain (`'fill'` or `'parent'`) instead of content height. */
+  readonly isFilling = computed(() => !this.isFixed() && this.heightMode() !== 'auto');
+  /** Fill the remaining space of a flex-column parent. */
+  readonly isFillMode = computed(() => this.isFilling() && this.heightMode() === 'fill');
+  /** Fill the parent's full height. */
+  readonly isParentMode = computed(() => this.isFilling() && this.heightMode() === 'parent');
   /**
    * `trackBy` for rows (improves rendering and preserves DOM state).
    * Defaults to identity tracking, matching `mat-table`'s built-in behavior.

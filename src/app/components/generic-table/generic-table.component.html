@@ -1,4 +1,4 @@
-<div class="generic-table" [class.generic-table--fluid]="isFluidMaxHeight()">
+<div class="generic-table" [class.generic-table--fill]="isFilling()">
   @if (showColumnToggle() && hideableColumns().length > 0) {
     <mat-chip-listbox
       class="generic-table__column-toggle"
@@ -16,7 +16,8 @@
 
   <div
     class="generic-table__scroll"
-    [class.generic-table__scroll--fluid]="isFluidMaxHeight()"
+    [class.generic-table__scroll--fill]="isFilling()"
+    [style.height]="height()"
     [style.max-height]="maxHeight()"
   >
     <table

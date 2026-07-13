@@ -100,7 +100,9 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `showColumnToggle`| `boolean`                | `true`                | Show the column visibility chips.                        |
 | `emptyMessage`    | `string`                 | `'No data available'` | Message shown when there are no rows.                    |
 | `rowClickable`    | `boolean`                | `false`               | Enable row click + hover styling.                        |
-| `maxHeight`       | `string \| null`         | `null`                | Cap the scroll area. Absolute lengths (`'320px'`) work on their own; relative values (`'100%'`, `'100cqh'`, `'100dvh'`) need a sized parent — see [Filling a flex parent](#filling-a-flex-parent) below. |
+| `heightMode`      | `'auto' \| 'fill' \| 'parent'` | `'auto'`        | Vertical sizing strategy — see [Height & scrolling](#height--scrolling). |
+| `height`          | `string \| null`         | `null`                | Exact, fixed height for the scroll body (e.g. `'320px'`). Wins over `heightMode`. |
+| `maxHeight`       | `string \| null`         | `null`                | Caps the scroll body height (e.g. `'320px'`). Composes with any `heightMode`. |
 | `trackBy`         | `TrackByFunction<T>`     | identity tracking     | Row `trackBy`; defaults to tracking by row identity.     |
 
 ## Outputs
@@ -111,32 +113,62 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `sortChange` | `Sort`      | Emitted when the sort state changes.               |
 | `pageChange` | `PageEvent` | Emitted when the page changes.                     |
 
-### Filling a flex parent
+### Height & scrolling
 
-Relative `maxHeight` values (`100%`, `100cqh`, `100dvh`, …) scroll inside the space
-left on the page. Two things usually block this:
+The table body scrolls (with a sticky header) whenever its content is taller than
+the height it's given. There are three ways to decide that height:
 
-1. **Flex items default to `min-height: auto`** — a `flex: 1` wrapper grows with
-   table content unless you set `min-height: 0`.
-2. **`container-type: inline-size` has no block axis** — `cqh` / `cqb` units need
-   `container-type: size` or `block-size` on the query container.
+| Goal | Use |
+| --- | --- |
+| **Grow with content** (optionally capped) | default `heightMode="auto"`, add `maxHeight="480px"` to cap |
+| **Fixed height** (always this tall) | `height="320px"` |
+| **Fill the remaining space** of a sized column | `heightMode="fill"` |
+| **Fill the parent's full height** | `heightMode="parent"` |
+
+`height` and `maxHeight` accept any CSS length (`px`, `rem`, `vh`, `cqh`, …).
+
+#### `heightMode="fill"` (fill remaining space)
+
+Best when the table sits alongside other content inside a container that already
+has a height. The component takes the leftover space and scrolls its body.
 
 ```css
 .table-panel {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  container-type: size; /* or block-size; required for cqh/cqb */
+  min-height: 0;   /* let the table shrink and scroll */
+  height: 100%;    /* or flex: 1 inside another flex column */
 }
 ```
 
 ```html
 <div class="table-panel">
-  <app-generic-table maxHeight="100%" [columns]="columns" [data]="rows()" />
-  <!-- or maxHeight="100cqh" when container-type includes block size -->
+  <h2>Team</h2>
+  <app-generic-table heightMode="fill" [columns]="columns" [data]="rows()" />
 </div>
 ```
+
+#### `heightMode="parent"` (fill parent height)
+
+Best when the table is the only child of an element that has a resolvable height.
+
+```html
+<div style="height: 400px">
+  <app-generic-table heightMode="parent" [columns]="columns" [data]="rows()" />
+</div>
+```
+
+#### Two common gotchas
+
+1. **A `flex: 1` ancestor needs `min-height: 0`.** Flex items default to
+   `min-height: auto`, so without this the ancestor grows with the table's content
+   instead of constraining it — the table appears to "expand beyond" the page.
+2. **`cqh`/`cqb` need a block-axis container.** `container-type: inline-size` only
+   establishes a width axis; use `container-type: size` (or `block-size`) if you
+   size with container-query height units.
+
+Both `fill` and `parent` degrade gracefully: if the parent can't resolve a height,
+the table simply falls back to growing with its content.
 
 ## `ColumnDef<T>`
 

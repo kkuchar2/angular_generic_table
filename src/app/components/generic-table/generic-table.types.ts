@@ -27,6 +27,20 @@ export interface ColumnDef<T = unknown> {
 }
 
 /**
+ * How the table sizes itself vertically.
+ *
+ * - `'auto'`: the body grows with its content. Pair with `maxHeight` to cap it.
+ * - `'fill'`: the body fills the remaining space of a flex-column parent
+ *   (`flex: 1`). Use when the table sits next to other content in a sized column.
+ * - `'parent'`: the body fills the parent's full height (`height: 100%`). Use
+ *   when the parent has a resolvable height and the table is its only child.
+ *
+ * `'fill'` and `'parent'` both scroll the body once rows exceed the available
+ * height, and both require the parent to resolve a height (see the README).
+ */
+export type GenericTableHeightMode = 'auto' | 'fill' | 'parent';
+
+/**
  * Context passed to a custom cell template projected with `appGenericTableCell`.
  *
  * @typeParam T - The row model the table renders.

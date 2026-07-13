@@ -32,9 +32,10 @@
   </article>
 
   <article class="home__demo">
-    <h2 class="home__demo-title">2. Scrollable (no pagination)</h2>
+    <h2 class="home__demo-title">2. Fixed / capped height</h2>
     <p class="home__demo-hint">
-      All rows in a fixed-height, scrollable body with a sticky header. Column toggle disabled.
+      <code>maxHeight="260px"</code> caps the scroll body: it grows with content up to the cap,
+      then scrolls under a sticky header. Use <code>height</code> instead for an always-fixed height.
     </p>
 
     <app-generic-table
@@ -47,7 +48,26 @@
   </article>
 
   <article class="home__demo">
-    <h2 class="home__demo-title">3. Custom cell templates</h2>
+    <h2 class="home__demo-title">3. Fill available height</h2>
+    <p class="home__demo-hint">
+      <code>heightMode="fill"</code> takes the space left in a sized flex column. This panel is a
+      fixed-height box with a heading; the table fills the remainder and scrolls.
+    </p>
+
+    <div class="home__fill-box">
+      <p class="home__fill-note">Fixed 320px panel &mdash; the table fills what's left.</p>
+      <app-generic-table
+        [columns]="columns"
+        [data]="rows()"
+        [showColumnToggle]="false"
+        [trackBy]="trackById"
+        heightMode="fill"
+      />
+    </div>
+  </article>
+
+  <article class="home__demo">
+    <h2 class="home__demo-title">4. Custom cell templates</h2>
     <p class="home__demo-hint">
       Multiple projected templates: an initials avatar, a mailto link, and a status badge.
     </p>
@@ -76,7 +96,7 @@
   </article>
 
   <article class="home__demo">
-    <h2 class="home__demo-title">4. Empty state</h2>
+    <h2 class="home__demo-title">5. Empty state</h2>
     <p class="home__demo-hint">A centered message replaces the rows when there is no data.</p>
 
     <app-generic-table
