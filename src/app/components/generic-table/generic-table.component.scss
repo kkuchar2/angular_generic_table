@@ -7,19 +7,24 @@
   min-height: 0;
 }
 
-// Fill the remaining space of a flex-column parent. `flex: 1 1 auto` keeps a
-// content-sized fallback, so a misconfigured parent degrades to `auto` instead
-// of collapsing to zero height.
+// Fill the remaining space of a flex-column parent. `flex-basis: 0` plus
+// `overflow: hidden` keeps row content from pushing the host past the parent's
+// allocated height — `flex: 1 1 auto` was still content-sized and overflowed.
 :host(.generic-table-host--fill) {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 
-// Fill the parent's full height. The parent must resolve a height, otherwise
-// `height: 100%` is ignored and the host falls back to content height.
+// Fill the parent's full height. Also participates as a flex item when the
+// parent is a column, so this works inside `flex: 1; min-height: 0` wrappers.
 :host(.generic-table-host--parent) {
-  height: 100%;
+  flex: 1 1 0;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .generic-table {
@@ -54,8 +59,9 @@
 // When filling, the wrapper and scroll body chain the resolved height downward
 // so the body (not the whole component) scrolls.
 .generic-table--fill {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .generic-table__scroll {
@@ -65,7 +71,7 @@
 }
 
 .generic-table__scroll--fill {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
 }
 

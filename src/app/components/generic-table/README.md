@@ -160,15 +160,33 @@ Best when the table is the only child of an element that has a resolvable height
 
 #### Two common gotchas
 
-1. **A `flex: 1` ancestor needs `min-height: 0`.** Flex items default to
-   `min-height: auto`, so without this the ancestor grows with the table's content
-   instead of constraining it — the table appears to "expand beyond" the page.
-2. **`cqh`/`cqb` need a block-axis container.** `container-type: inline-size` only
-   establishes a width axis; use `container-type: size` (or `block-size`) if you
-   size with container-query height units.
+1. **The table's direct parent must be a flex column.** `flex: 1; min-height: 0` on an
+   ancestor is not enough — the element that wraps `app-generic-table` also needs
+   `display: flex; flex-direction: column; min-height: 0`, otherwise `heightMode="fill"`
+   has no flex context to fill and the table grows with its rows.
+2. **Every `flex: 1` ancestor in the chain needs `min-height: 0`.** Flex items default
+   to `min-height: auto`, so one missing `min-height: 0` lets content push the page.
+3. **`cqh`/`cqb` need a block-axis container.** `container-type: inline-size` only
+   establishes a width axis; use `container-type: size` (or `block-size`) for
+   container-query height units.
 
-Both `fill` and `parent` degrade gracefully: if the parent can't resolve a height,
-the table simply falls back to growing with its content.
+Typical app-shell layout:
+
+```css
+.page { display: flex; flex-direction: column; height: 100vh; }
+.page__main {
+  flex: 1;
+  min-height: 0;
+  display: flex;           /* required on the table's parent */
+  flex-direction: column;  /* required on the table's parent */
+}
+```
+
+```html
+<main class="page__main">
+  <app-generic-table heightMode="fill" [paginated]="false" ... />
+</main>
+```
 
 ## `ColumnDef<T>`
 
