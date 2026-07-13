@@ -40,7 +40,6 @@ const RELATIVE_MAX_HEIGHT = /(?:%|cqh|cqb|cqmin|cqmax|dvh|dvb|svh|svb|lvh|lvb|vh
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'generic-table-host',
-    '[class.generic-table-host--bounded]': 'hasBoundedHeight()',
     '[class.generic-table-host--fluid]': 'isFluidMaxHeight()',
   },
 })
@@ -63,9 +62,6 @@ export class GenericTableComponent<T = unknown> {
   readonly rowClickable = input(false);
   /** Caps the scroll container height, e.g. `'320px'`, `'100%'`, or `'100cqh'`. */
   readonly maxHeight = input<string | null>(null);
-
-  /** `maxHeight` is set — the host must not expand a flex parent with its content. */
-  readonly hasBoundedHeight = computed(() => this.maxHeight() != null);
 
   /**
    * Relative `maxHeight` values (`%`, `cqh`, `vh`, …) use a flex fill chain so the
