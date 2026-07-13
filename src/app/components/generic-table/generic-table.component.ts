@@ -20,6 +20,9 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { GenericTableCellDirective } from './generic-table-cell.directive';
 import { ColumnDef, GenericTableCellContext } from './generic-table.types';
 
+/** Units that size against a parent/container rather than an absolute length. */
+const RELATIVE_MAX_HEIGHT = /(?:%|cqh|cqb|cqmin|cqmax|dvh|dvb|svh|svb|lvh|lvb|vh|vb)$/i;
+
 /**
  * A configurable, signal-based table built on Angular Material's `mat-table`.
  *
@@ -37,6 +40,7 @@ import { ColumnDef, GenericTableCellContext } from './generic-table.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'generic-table-host',
+    '[class.generic-table-host--bounded]': 'hasBoundedHeight()',
     '[class.generic-table-host--fluid]': 'isFluidMaxHeight()',
   },
 })
@@ -57,13 +61,19 @@ export class GenericTableComponent<T = unknown> {
   readonly emptyMessage = input('No data available');
   /** Emit `rowClick` and apply hover styling when true. */
   readonly rowClickable = input(false);
-  /** Caps the scroll container height, e.g. `'320px'` or `'100%'` to fill a sized parent. */
+  /** Caps the scroll container height, e.g. `'320px'`, `'100%'`, or `'100cqh'`. */
   readonly maxHeight = input<string | null>(null);
 
-  /** Percentage `maxHeight` values use flex fill layout instead of content-sized height. */
+  /** `maxHeight` is set — the host must not expand a flex parent with its content. */
+  readonly hasBoundedHeight = computed(() => this.maxHeight() != null);
+
+  /**
+   * Relative `maxHeight` values (`%`, `cqh`, `vh`, …) use a flex fill chain so the
+   * cap resolves against a sized parent instead of content height.
+   */
   readonly isFluidMaxHeight = computed(() => {
-    const height = this.maxHeight();
-    return height != null && /%$/.test(height.trim());
+    const height = this.maxHeight()?.trim();
+    return height != null && RELATIVE_MAX_HEIGHT.test(height);
   });
   /**
    * `trackBy` for rows (improves rendering and preserves DOM state).

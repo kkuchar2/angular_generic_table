@@ -100,7 +100,7 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `showColumnToggle`| `boolean`                | `true`                | Show the column visibility chips.                        |
 | `emptyMessage`    | `string`                 | `'No data available'` | Message shown when there are no rows.                    |
 | `rowClickable`    | `boolean`                | `false`               | Enable row click + hover styling.                        |
-| `maxHeight`       | `string \| null`         | `null`                | Cap the scroll container height, e.g. `'320px'`. Percentages (e.g. `'100%'`) fill a sized parent via flex layout — the parent needs a defined height (`flex: 1; min-height: 0` in a column flex container works). |
+| `maxHeight`       | `string \| null`         | `null`                | Cap the scroll area. Absolute lengths (`'320px'`) work on their own; relative values (`'100%'`, `'100cqh'`, `'100dvh'`) need a sized parent — see [Filling a flex parent](#filling-a-flex-parent) below. |
 | `trackBy`         | `TrackByFunction<T>`     | identity tracking     | Row `trackBy`; defaults to tracking by row identity.     |
 
 ## Outputs
@@ -110,6 +110,33 @@ The row type `T` is inferred from the `data`/`columns` inputs, so `cell`,
 | `rowClick`   | `T`         | Emitted on row click when `rowClickable` is true.  |
 | `sortChange` | `Sort`      | Emitted when the sort state changes.               |
 | `pageChange` | `PageEvent` | Emitted when the page changes.                     |
+
+### Filling a flex parent
+
+Relative `maxHeight` values (`100%`, `100cqh`, `100dvh`, …) scroll inside the space
+left on the page. Two things usually block this:
+
+1. **Flex items default to `min-height: auto`** — a `flex: 1` wrapper grows with
+   table content unless you set `min-height: 0`.
+2. **`container-type: inline-size` has no block axis** — `cqh` / `cqb` units need
+   `container-type: size` or `block-size` on the query container.
+
+```css
+.table-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  container-type: size; /* or block-size; required for cqh/cqb */
+}
+```
+
+```html
+<div class="table-panel">
+  <app-generic-table maxHeight="100%" [columns]="columns" [data]="rows()" />
+  <!-- or maxHeight="100cqh" when container-type includes block size -->
+</div>
+```
 
 ## `ColumnDef<T>`
 
