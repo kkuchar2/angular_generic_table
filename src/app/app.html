@@ -1,1 +1,28 @@
+<nav class="app-nav">
+  <a class="app-nav__link" routerLink="/" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{ exact: true }">
+    Generic Table
+  </a>
+  <a class="app-nav__link" routerLink="/dashboard" routerLinkActive="app-nav__link--active">
+    Dashboard
+  </a>
+
+  <span class="app-nav__spacer" aria-hidden="true"></span>
+
+  <button
+    type="button"
+    class="app-nav__theme-toggle"
+    (click)="themeService.toggle()"
+    [attr.aria-label]="themeService.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+    [attr.title]="themeService.theme() === 'dark' ? 'Light mode' : 'Dark mode'"
+  >
+    @if (themeService.theme() === 'dark') {
+      <span class="app-nav__theme-icon" aria-hidden="true">☀️</span>
+      <span class="app-nav__theme-label">Light</span>
+    } @else {
+      <span class="app-nav__theme-icon" aria-hidden="true">🌙</span>
+      <span class="app-nav__theme-label">Dark</span>
+    }
+  </button>
+</nav>
+
 <router-outlet />

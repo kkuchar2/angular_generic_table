@@ -38,6 +38,9 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
+      angular-gridster2:
+        specifier: 22.0.0
+        version: 22.0.0(@angular/common@22.0.6(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2)
       angular-oauth2-oidc:
         specifier: ^20.0.0
         version: 20.0.3(@angular/common@22.0.6(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))
@@ -1717,6 +1720,13 @@ packages:
       eslint: ^9.0.0 || ^10.0.0
       typescript: '*'
       typescript-eslint: ^8.0.0
+
+  angular-gridster2@22.0.0:
+    resolution: {integrity: sha512-LkbuBUSWN8TcEovFhHC9UKDalFEsgrMzFikxowc83IsgMwuLWQeHnIQVTuqvuzVB/OosCUg5vK8uCPNtNRjj2g==}
+    peerDependencies:
+      '@angular/common': ^22.0.0
+      '@angular/core': ^22.0.0
+      rxjs: ^7.0.0
 
   angular-oauth2-oidc@20.0.3:
     resolution: {integrity: sha512-SL0iV/WlrX35J4CXvc7VdoNhlol+YIo8c0i1NrfAQ70++dxLZjg/li6vNx7lu2sC3GElZLzmlbBZOvlvLB2Q5w==}
@@ -4774,6 +4784,13 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
       - supports-color
+
+  angular-gridster2@22.0.0(@angular/common@22.0.6(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2):
+    dependencies:
+      '@angular/common': 22.0.6(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
 
   angular-oauth2-oidc@20.0.3(@angular/common@22.0.6(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.0.6(@angular/compiler@22.0.6)(rxjs@7.8.2)):
     dependencies:

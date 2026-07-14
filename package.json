@@ -23,6 +23,7 @@
     "@angular/router": "^22.0.0",
     "@ngxpert/hot-toast": "^5.0.0",
     "@types/node": "^22.0.0",
+    "angular-gridster2": "22.0.0",
     "angular-oauth2-oidc": "^20.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

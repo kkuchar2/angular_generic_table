@@ -1,10 +1,14 @@
+import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Component, signal } from '@angular/core';
 
 import {
   ColumnDef,
   GenericTableCellDirective,
   GenericTableComponent,
+  GenericTableHeightMode,
 } from '../../components/generic-table';
+
+import { ResizeObserverDirective } from './resize-observer.directive';
 
 interface DemoUser {
   id: number;
@@ -15,9 +19,27 @@ interface DemoUser {
   createdAt: Date;
 }
 
+interface HeightDemoCard {
+  id: string;
+  code: string;
+  description: string;
+  heightMode?: GenericTableHeightMode;
+  height?: string;
+  maxHeight?: string;
+  /** Resizable shell is a flex column (required for fill / parent). */
+  flexShell?: boolean;
+  toolbar?: boolean;
+}
+
 @Component({
   selector: 'app-home',
-  imports: [GenericTableComponent, GenericTableCellDirective],
+  imports: [
+    CdkDrag,
+    CdkDragHandle,
+    GenericTableComponent,
+    GenericTableCellDirective,
+    ResizeObserverDirective,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -41,6 +63,50 @@ export class HomeComponent {
     { key: 'email', header: 'Email' },
     { key: 'department', header: 'Department', sortable: true },
     { key: 'status', header: 'Status', align: 'center', width: '120px' },
+  ];
+
+  /** Slimmer columns for the height-constraint demos. */
+  readonly scrollColumns: ColumnDef<DemoUser>[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'department', header: 'Department', sortable: true },
+    { key: 'status', header: 'Status', align: 'center', width: '100px' },
+  ];
+
+  readonly heightDemos: HeightDemoCard[] = [
+    {
+      id: 'auto',
+      code: 'heightMode="auto"',
+      description: 'Default — the table grows with its rows.',
+    },
+    {
+      id: 'fixed',
+      code: 'height="200px"',
+      description: 'Fixed — the scroll body is always 200px tall.',
+      height: '200px',
+      flexShell: true,
+    },
+    {
+      id: 'max',
+      code: 'maxHeight="160px"',
+      description: 'Capped — grows with content up to 160px.',
+      maxHeight: '160px',
+      flexShell: true,
+    },
+    {
+      id: 'parent',
+      code: 'heightMode="parent"',
+      description: 'Fills the resizable container height.',
+      heightMode: 'parent',
+      flexShell: true,
+    },
+    {
+      id: 'fill',
+      code: 'heightMode="fill"',
+      description: 'Fills space below the toolbar in a flex column.',
+      heightMode: 'fill',
+      flexShell: true,
+      toolbar: true,
+    },
   ];
 
   readonly rows = signal<DemoUser[]>([
